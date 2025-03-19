@@ -3,9 +3,11 @@ from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
 import json
 
-url = "https://www.ebay.com/sch/i.html?_nkw=wallet&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313"
 
-async def extract_ebay_products():
+async def extract_ebay_products(query: str):
+
+    url = f"https://www.ebay.com/sch/i.html?_nkw={query.replace(' ', '+')}&_sacat=0&_from=R40&_trksid=p4432023.m570.l1313"
+
     browser_config = BrowserConfig(
         browser_type="chromium",
         headless=True,
@@ -70,7 +72,6 @@ async def extract_ebay_products():
             try:
                 products = json.loads(result.extracted_content)
                 print(f"Found {len(products)} products")
-                
                 for product in products:
                     print("\n------- Product -------")
                     print(f"Title: {product.get('title')}")
@@ -83,6 +84,7 @@ async def extract_ebay_products():
                 with open("ebay_products.json", "w", encoding="utf-8") as f:
                     json.dump(products, f, ensure_ascii=False, indent=4)
                 print("\nResults saved to ebay_products.json")
+                return products
             except json.JSONDecodeError as e:
                 print("Error decoding JSON:", e)
                 print("Raw content:", result.extracted_content)
@@ -92,6 +94,6 @@ async def extract_ebay_products():
                 print("Response status:", result.status)
                 print("Error message:", result.error_message if hasattr(result, 'error_message') else "None")
 
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(extract_ebay_products())
+# if __name__ == "__main__":
+#     import asyncio
+#     asyncio.run(extract_ebay_products())

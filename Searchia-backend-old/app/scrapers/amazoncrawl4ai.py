@@ -68,6 +68,8 @@ async def extract_amazon_products():
 
         if result and result.extracted_content:
             products = json.loads(result.extracted_content)
+            for idx, product in enumerate(products, start=1):
+                product["id"] = idx
             for product in products:
                 print(f"title:{product.get('title')}")
                 print(f"image:{product.get('image')}")

@@ -1,52 +1,43 @@
+import React, { useState } from 'react';
+import { Search } from 'lucide-react';
+import { useStore } from '../store/useStore';
+import { searchProducts } from '../lib/api';
 
-import type React from "react"
+export const SearchBar = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { setSearchTerm, setSearchResults } = useStore();
 
-import { useState } from "react"
-import { Search } from "lucide-react"
-import { useSearchStore } from "@/store/searchStore"
-import { searchProducts } from "../services/api"
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const query = formData.get('search') as string;
 
-export default function SearchBar() {
-  const [query, setQuery] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const { setResults, setSearchQuery } = useSearchStore()
+    if (!query.trim()) return;
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!query.trim()) return
-
-    setIsLoading(true)
-    try {
-      const results = await searchProducts(query)
-      setResults(results)
-      setSearchQuery(query)
-    } catch (error) {
-      console.error("Search error:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    setIsLoading(true);
+    setSearchTerm(query);
+    const results = await searchProducts(query);
+    setSearchResults(results);
+    setIsLoading(false);
+  };
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-2xl mx-auto mb-8">
+    <form onSubmit={handleSearch} className="w-full max-w-3xl mx-auto">
       <div className="relative">
         <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          type="search"
+          name="search"
           placeholder="Search for products..."
-          className="w-full px-4 py-3 pl-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
-        <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
         <button
           type="submit"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700"
           disabled={isLoading}
-          className="absolute right-2 top-2 px-4 py-1.5 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors disabled:opacity-70"
         >
-          {isLoading ? "Searching..." : "Search"}
+          <Search className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
         </button>
       </div>
     </form>
-  )
-}
-
+  );
+};
