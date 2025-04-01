@@ -36,7 +36,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className="ml-1">{product.rating}</span>
         </div>
         <div className="mt-2 flex items-center justify-between">
-          <span className="text-xl font-bold">${product.price}</span>
+          <span className="text-xl font-bold">{product.price}</span>
           <button
             onClick={handleAddToCart}
             className="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"

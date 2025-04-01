@@ -13,6 +13,7 @@ interface StoreState {
   addToComparisonCart: (product: Product) => void;
   removeFromComparisonCart: (productId: string) => void;
   clearComparisonCart: () => void;
+  clearSearchState: () => void; // New method to clear search-related states
 }
 
 export const useStore = create<StoreState>()(
@@ -37,9 +38,22 @@ export const useStore = create<StoreState>()(
           comparisonCart: state.comparisonCart.filter((p) => p.id !== productId),
         })),
       clearComparisonCart: () => set({ comparisonCart: [] }),
+      clearSearchState: () => set({ 
+        searchTerm: '', 
+        searchResults: [],
+        filters: {
+          sortBy: 'price',
+          order: 'asc',
+        }
+      }),
     }),
     {
       name: 'ecommerce-store',
+      // Add these options to control persistence and initial load
+      partialize: (state) => ({
+        comparisonCart: state.comparisonCart, // Only persist comparison cart
+      }),
+      version: 1, // Add version to help with migrations
     }
   )
 );

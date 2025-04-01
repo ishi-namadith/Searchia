@@ -5,14 +5,17 @@ import { searchProducts } from '../lib/api';
 
 export const SearchBar = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { setSearchTerm, setSearchResults } = useStore();
+  const { setSearchTerm, setSearchResults, clearSearchState } = useStore();
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const query = formData.get('search') as string;
 
-    if (!query.trim()) return;
+    if (!query.trim()) {
+      clearSearchState(); // Clear search state if query is empty
+      return;
+    }
 
     setIsLoading(true);
     setSearchTerm(query);

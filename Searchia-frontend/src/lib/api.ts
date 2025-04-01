@@ -50,27 +50,30 @@ const mockProducts: Product[] = [
   }
 ];
 
-const API_BASE_URL = 'https://api.example.com';
+const API_BASE_URL = 'http://127.0.0.1:5000/';
 
-const isProduction = process.env.NODE_ENV === 'production';
+// const isProduction = process.env.NODE_ENV === 'production';
 
 export const searchProducts = async (query: string): Promise<Product[]> => {
-  if (!isProduction) {
-    // Return filtered mock data in development
-    const searchTerm = query.toLowerCase().trim();
-    return mockProducts.filter(product => 
-      product.title.toLowerCase().includes(searchTerm)
-    );
-  }
+  // if (!isProduction) {
+  //   // Return filtered mock data in development
+  //   const searchTerm = query.toLowerCase().trim();
+  //   return mockProducts.filter(product => 
+  //     product.title.toLowerCase().includes(searchTerm)
+  //   );
+  // }
 
   try {
-    const [source1, source2, source3] = await Promise.all([
-      axios.get(`${API_BASE_URL}/scraper1/search?q=${query}`),
-      axios.get(`${API_BASE_URL}/scraper2/search?q=${query}`),
-      axios.get(`${API_BASE_URL}/scraper3/search?q=${query}`),
+    console.log(`Searching for: ${query}`);  // Debugging log
+
+    const [source1, source2] = await Promise.all([
+      axios.get(`${API_BASE_URL}/ebay?product=${query}`),
+      axios.get(`${API_BASE_URL}/amazon?product=${query}`),
     ]);
 
-    return [...source1.data, ...source2.data, ...source3.data];
+    const results = [...source1.data, ...source2.data, ];
+    console.log("Search results:", results); // Debugging log
+    return results;
   } catch (error) {
     console.error('Error searching products:', error);
     return [];
@@ -78,14 +81,14 @@ export const searchProducts = async (query: string): Promise<Product[]> => {
 };
 
 export const getProductDetails = async (productUrl: string) => {
-  if (!isProduction) {
-    return {
-      reviews: {
-        positive: 'Great build quality and performance. Battery life is excellent.',
-        negative: 'Price is a bit high. Could have more color options.'
-      }
-    };
-  }
+  // if (!isProduction) {
+  //   return {
+  //     reviews: {
+  //       positive: 'Great build quality and performance. Battery life is excellent.',
+  //       negative: 'Price is a bit high. Could have more color options.'
+  //     }
+  //   };
+  // }
 
   try {
     const { data } = await axios.get(`${API_BASE_URL}/product-details?url=${productUrl}`);
@@ -97,9 +100,9 @@ export const getProductDetails = async (productUrl: string) => {
 };
 
 export const addToComparisonCart = async (product: Product) => {
-  if (!isProduction) {
-    return true;
-  }
+  // if (!isProduction) {
+  //   return true;
+  // }
 
   try {
     await axios.post(`${API_BASE_URL}/comparison-cart`, product);
@@ -109,9 +112,9 @@ export const addToComparisonCart = async (product: Product) => {
 };
 
 export const getComparisonCart = async () => {
-  if (!isProduction) {
-    return [];
-  }
+  // if (!isProduction) {
+  //   return [];
+  // }
 
   try {
     const { data } = await axios.get(`${API_BASE_URL}/comparison-cart`);
@@ -123,12 +126,12 @@ export const getComparisonCart = async () => {
 };
 
 export const compareProducts = async (products: Product[]) => {
-  if (!isProduction) {
-    return {
-      ranking: products.sort((a, b) => b.rating - a.rating),
-      analysis: 'Products ranked based on customer ratings and price-performance ratio.'
-    };
-  }
+  // if (!isProduction) {
+  //   return {
+  //     ranking: products.sort((a, b) => b.rating - a.rating),
+  //     analysis: 'Products ranked based on customer ratings and price-performance ratio.'
+  //   };
+  // }
 
   try {
     const { data } = await axios.post(`${API_BASE_URL}/compare`, { products });

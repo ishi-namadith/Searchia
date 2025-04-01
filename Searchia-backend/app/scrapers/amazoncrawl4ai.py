@@ -1,24 +1,29 @@
 from crawl4ai import AsyncWebCrawler, CacheMode
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
-from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
+from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, ProxyConfig
 import json
 
-url = "https://www.amazon.com/s?k=earbuds"
 
-async def extract_amazon_products():
+async def extract_amazon_products(product):
+
+    url = f"https://www.amazon.com/s?k={product}"
+
+    proxy_config = ProxyConfig(
+        server="http://proxy.scrapeops.io:5353",
+        username="scrapeops",
+        password="b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
+    )
+
     browser_config = BrowserConfig(
         browser_type= "chromium",
-        headless = True,
-        proxy_config={
-            "server": "http://proxy.scrapeops.io:5353",
-            "username": "scrapeops",
-            "password": "6a4520ff-a331-4368-8384-07ff8ecc175f"
-        },
-        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=6a4520ff-a331-4368-8384-07ff8ecc175f"
+        headless = False,
+        proxy_config=proxy_config,
+        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
     )
 
     crawler_config = CrawlerRunConfig(
         cache_mode=CacheMode.BYPASS,
+        page_timeout=120000,
         extraction_strategy=JsonCssExtractionStrategy(
             verbose=True,
             schema={
@@ -48,7 +53,7 @@ async def extract_amazon_products():
                     },
                     {
                         "name": "reviews_count",
-                        "selector": "[data-csa-c-func-deps=aui-da-a-popover]",
+                        "selector": "span.a-size-base",
                         "type": "text"
                     },
                     {
@@ -70,16 +75,10 @@ async def extract_amazon_products():
             products = json.loads(result.extracted_content)
             for idx, product in enumerate(products, start=1):
                 product["id"] = idx
-            for product in products:
-                print(f"title:{product.get('title')}")
-                print(f"image:{product.get('image')}")
-                print(f"rating:{product.get('rating')}")
-                print(f"price:{product.get('price')}")
-                print(f"reviews_count:{product.get('reviews_count')}")
-                print(f"product_url:{product.get('product_url')}")
-            with open("amazon_products.json", "w", encoding="utf-8") as f:
-                json.dump(products, f, ensure_ascii=False, indent=4)
+            return products
+        else:
+            print("No results extracted.")
+            if result:
+                print(result.extracted_content)
+            return []
 
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(extract_amazon_products())

@@ -1,23 +1,48 @@
-from fastapi import FastAPI
-from app.api.scraper_routes import router as scraper_router
-from fastapi.middleware.cors import CORSMiddleware 
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from scrapers.ebaycrawl4ai import extract_ebay_products
+from scrapers.amazoncrawl4ai import extract_amazon_products
+import asyncio
+import threading
+from concurrent.futures import ThreadPoolExecutor
 
-app = FastAPI(title="Searchia API")
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-origins = [
-    "http://localhost:3000"
-]
+def run_async_task(async_func, product):
+    return asyncio.run(async_func(product))
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Allowed origins
-    allow_credentials=True,  # Allow cookies and authentication
-    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, etc.)
-    allow_headers=["*"],  # Allow all headers
-)
-# Include all scraper routes
-app.include_router(scraper_router)
+@app.route('/')
+def index():
+    return "Hello, Searchia!"
+
+@app.route('/ebay')
+def ebay():
+    product = request.args.get("product", type=str)
+    if not product:
+        return jsonify({"error": "Product parameter is required"}), 400
+    try:
+        with ThreadPoolExecutor() as executor:
+            future = executor.submit(run_async_task, extract_ebay_products, product)
+            products = future.result()  # This will wait for the task to complete
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/amazon')
+def amazon():
+    product = request.args.get("product", type=str)
+    if not product:
+        return jsonify({"error": "Product parameter is required"}), 400
+    
+    try:
+        with ThreadPoolExecutor() as executor:
+            # Submit the task and wait for the result
+            future = executor.submit(run_async_task, extract_amazon_products, product)
+            products = future.result()  # This will wait for the task to complete
+        return jsonify(products)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
+    app.run(debug=True)
