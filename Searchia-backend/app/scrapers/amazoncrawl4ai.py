@@ -11,14 +11,14 @@ async def extract_amazon_products(product):
     proxy_config = ProxyConfig(
         server="http://proxy.scrapeops.io:5353",
         username="scrapeops",
-        password="b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
+        password="5ac468ac-6d92-4426-9338-64fbef1794bd"
     )
 
     browser_config = BrowserConfig(
         browser_type= "chromium",
-        headless = False,
+        headless = True,
         proxy_config=proxy_config,
-        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
+        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=5ac468ac-6d92-4426-9338-64fbef1794bd"
     )
 
     crawler_config = CrawlerRunConfig(

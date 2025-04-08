@@ -8,13 +8,13 @@ url = "https://www.ebay.com/itm/274788823286?_skw=earbuds&epid=2319679599&itmmet
 async def extract_ebay_reviews():
     browser_config = BrowserConfig(
         browser_type= "chromium",
-        headless = False,
+        headless = True,
         proxy_config={
             "server": "http://proxy.scrapeops.io:5353",
             "username": "scrapeops",
-            "password": "aa8ec9b6-0eac-44ef-b872-d327686b63ff"
+            "password": "5ac468ac-6d92-4426-9338-64fbef1794bd"
         },
-        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=aa8ec9b6-0eac-44ef-b872-d327686b63ff"
+        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=5ac468ac-6d92-4426-9338-64fbef1794bd"
     )
 
     crawler_config = CrawlerRunConfig(

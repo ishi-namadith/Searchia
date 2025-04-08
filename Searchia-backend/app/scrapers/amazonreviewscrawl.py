@@ -3,21 +3,19 @@ from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
 from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, ProxyConfig
 import json
 
-url = "https://www.amazon.com/Soundcore-Auto-Adjustable-Cancelling-Wireless-Headphone/dp/B0B1LVC5VZ/ref=sr_1_35?sr=8-35&xpid=EG9S-2YHDq1mf"
-
-async def extract_amazon_reviews():
+async def extract_amazon_reviews(url):
     # Create a proper ProxyConfig object instead of a dict
     proxy_config = ProxyConfig(
         server="http://proxy.scrapeops.io:5353",
         username="scrapeops",
-        password="b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
+        password="5ac468ac-6d92-4426-9338-64fbef1794bd"
     )
 
     browser_config = BrowserConfig(
         browser_type="chromium",
         headless=False,
         proxy_config=proxy_config,  # Use the ProxyConfig object
-        user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=b4cdf3a3-634f-4ca9-9ee7-066089cd8725"
+        user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=5ac468ac-6d92-4426-9338-64fbef1794bd"
     )
 
     crawler_config = CrawlerRunConfig(
@@ -41,12 +39,16 @@ async def extract_amazon_reviews():
     )
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result = await crawler.arun(url=url, config=crawler_config)
-        print(result.extracted_content)
+
         if result and result.extracted_content:
             reviews = json.loads(result.extracted_content)
-            with open("amazon_product_reviews.json", "w", encoding="utf-8") as f:
-                json.dump(reviews, f, ensure_ascii=False, indent=4)
+            return reviews
+            
+        else:
+            print("No results extracted.")
+            if result:
+                print("Response status:", result.status)
+                print("Error message:", result.error_message if hasattr(result, 'error_message') else "None")
+            return []
 
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(extract_amazon_reviews())
+                

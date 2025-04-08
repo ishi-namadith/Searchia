@@ -45,7 +45,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </button>
         </div>
         <a
-          href={product.productUrl}
+          href={product.product_url}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 text-sm text-blue-500 hover:underline block"

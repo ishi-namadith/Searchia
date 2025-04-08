@@ -4,7 +4,7 @@ export interface Product {
   price: number;
   rating: number;
   image: string;
-  productUrl: string;
+  product_url: string;
   source: string;
   description?: string;
   reviews?: {
