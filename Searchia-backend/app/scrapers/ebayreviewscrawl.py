@@ -12,9 +12,9 @@ async def extract_ebay_reviews():
         proxy_config={
             "server": "http://proxy.scrapeops.io:5353",
             "username": "scrapeops",
-            "password": "5ac468ac-6d92-4426-9338-64fbef1794bd"
+            "password": "da330ae8-5df2-464d-b505-aa53d713cdd7"
         },
-        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=5ac468ac-6d92-4426-9338-64fbef1794bd"
+        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=da330ae8-5df2-464d-b505-aa53d713cdd7"
     )
 
     crawler_config = CrawlerRunConfig(

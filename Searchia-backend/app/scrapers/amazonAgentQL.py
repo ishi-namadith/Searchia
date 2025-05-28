@@ -3,11 +3,8 @@ from playwright.async_api import async_playwright
 import asyncio
 from dotenv import load_dotenv
 import os
-load_dotenv()
 
-API_KEY = os.getenv("SCRAPEOPS_API_KEY")
-
-async def extract_ebay_reviews(url):
+async def extract_amazon_reviews(url):
     REVIEWS_QUERY = """
     {
         reviews[] {
@@ -29,7 +26,7 @@ async def extract_ebay_reviews(url):
 
         context = await browser.new_context(
             ignore_https_errors=True,
-            user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=6ed5ed82-1938-4ba2-9495-5291c4596945",
+            user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=6ed5ed82-1938-4ba2-9495-5291c4596945"
         )
 
         page = await agentql.wrap_async(context.new_page())
