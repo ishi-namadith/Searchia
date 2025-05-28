@@ -1,20 +1,27 @@
 from crawl4ai import AsyncWebCrawler, CacheMode
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
-from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
+from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, ProxyConfig
 import json
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 url = "https://www.aliexpress.com/w/wholesale-iphone-11.html?spm=a2g0o.productlist.search.0"
 
 async def extract_aliexpress_products():
+
+    proxy_config = ProxyConfig(
+        server="http://proxy.scrapeops.io:5353",
+        username="scrapeops",
+        password= "197c754b-2c58-4276-80f3-134137f83072",
+    )
+
     browser_config = BrowserConfig(
         browser_type="chromium",
         headless=True,
-        proxy_config={
-            "server": "http://proxy.scrapeops.io:5353",
-            "username": "scrapeops",
-            "password": "6a4520ff-a331-4368-8384-07ff8ecc175f"
-        },
-        user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=6a4520ff-a331-4368-8384-07ff8ecc175f"
+        proxy_config=proxy_config,
+        user_agent="http://headers.scrapeops.io/v1/user-agents?api_key=197c754b-2c58-4276-80f3-134137f83072"
     )
 
     crawler_config = CrawlerRunConfig(
@@ -23,7 +30,7 @@ async def extract_aliexpress_products():
             verbose=True,
             schema={
                 "name": "aliexpress products",
-                "baseSelector": "#card-list",  
+                "baseSelector": "div.list--gallery--34TropR > div",  
                 "fields": [
                     {
                         "name": "title",

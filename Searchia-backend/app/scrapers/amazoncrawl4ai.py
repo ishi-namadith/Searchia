@@ -1,24 +1,39 @@
 from crawl4ai import AsyncWebCrawler, CacheMode
 from crawl4ai.extraction_strategy import JsonCssExtractionStrategy
-from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig
+from crawl4ai.async_configs import BrowserConfig, CrawlerRunConfig, ProxyConfig
 import json
+import asyncio
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-url = "https://www.amazon.com/s?k=earbuds"
+API_KEY = os.getenv("SCRAPEOPS_API_KEY")
 
-async def extract_amazon_products():
+async def extract_amazon_products(product):
+
+    url = f"https://www.amazon.com/s?k={product}"
+    print("ext - amzn url", url)
+
+    proxy_config = ProxyConfig(
+        server="http://proxy.scrapeops.io:5353",
+        username="scrapeops",
+        password= API_KEY,
+    )
+
     browser_config = BrowserConfig(
         browser_type= "chromium",
         headless = True,
-        proxy_config={
-            "server": "http://proxy.scrapeops.io:5353",
-            "username": "scrapeops",
-            "password": "6a4520ff-a331-4368-8384-07ff8ecc175f"
-        },
-        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key=6a4520ff-a331-4368-8384-07ff8ecc175f"
+        proxy_config=proxy_config,
+        user_agent= "http://headers.scrapeops.io/v1/user-agents?api_key={API_KEY}",
+        light_mode= True,
+        use_persistent_context=True,
+        use_managed_browser= True
     )
 
     crawler_config = CrawlerRunConfig(
+        js_code="window.scrollTo(0, document.body.scrollHeight);",
         cache_mode=CacheMode.BYPASS,
+        page_timeout=120000,
         extraction_strategy=JsonCssExtractionStrategy(
             verbose=True,
             schema={
@@ -48,7 +63,7 @@ async def extract_amazon_products():
                     },
                     {
                         "name": "reviews_count",
-                        "selector": "[data-csa-c-func-deps=aui-da-a-popover]",
+                        "selector": "span.a-size-base",
                         "type": "text"
                     },
                     {
@@ -64,20 +79,25 @@ async def extract_amazon_products():
 
 
     async with AsyncWebCrawler(config=browser_config) as crawler:
+        session_id = "amzn_session"
         result = await crawler.arun(url=url, config=crawler_config)
+
+        # result = await asyncio.wait_for(
+        #          crawler.arun(url=url, config=crawler_config), timeout=1600
+        #     )
 
         if result and result.extracted_content:
             products = json.loads(result.extracted_content)
-            for product in products:
-                print(f"title:{product.get('title')}")
-                print(f"image:{product.get('image')}")
-                print(f"rating:{product.get('rating')}")
-                print(f"price:{product.get('price')}")
-                print(f"reviews_count:{product.get('reviews_count')}")
-                print(f"product_url:{product.get('product_url')}")
-            with open("amazon_products.json", "w", encoding="utf-8") as f:
-                json.dump(products, f, ensure_ascii=False, indent=4)
+            for idx, product in enumerate(products, start=1):
+                product["id"] = idx
+            #await crawler.crawler_strategy.kill_session(session_id)
+            print("product search done amzn")
+            return products
+        else:
+            #await crawler.crawler_strategy.kill_session(session_id)
 
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(extract_amazon_products())
+            print("No results extracted.")
+            if result:
+                print(result.extracted_content)
+            return []
+

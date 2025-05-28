@@ -1,0 +1,4 @@
+flask
+crawl4ai
+agentql
+langchain
