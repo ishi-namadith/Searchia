@@ -155,7 +155,7 @@ Special thanks to:
 
 ## 📞 Contact
 
-**Project Developer**: [Your Name]
+**Project Developer**: Ishira Namadith
 - Email: namadithishira@gmail.com
 - LinkedIn: www.linkedin.com/in/ishira-namadith
 - GitHub: [@ishi-namadith](https://github.com/ishi-namadith)
