@@ -75,6 +75,8 @@ pip install -r requirements.txt
 
 # Start the backend server
 python app.py
+
+#if scrappers fail change the ScrapeOPS API key by generating a new one cuz of the limitations in free trial
 ```
 
 ### 4. Frontend setup
